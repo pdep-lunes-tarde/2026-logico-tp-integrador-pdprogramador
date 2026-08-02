@@ -4,6 +4,10 @@
 
 **Equipo:** 
 
+- Nehuen Andre Bergamin Paszkaniak
+- Yael Saroka
+- Demian Kentaro Ramas Mato
+
 ## Fecha de entrega de parte 1
 
 3 de agosto.
