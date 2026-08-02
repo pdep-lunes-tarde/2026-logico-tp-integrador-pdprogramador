@@ -29,7 +29,47 @@ estaViva(Persona, Anio) :-
     anioDeMuerte(Persona, AnioMuerte),
     AnioMuerte >= Anio.
 
+% PARTE N°2
+recuerdo(wirbel, rescatar_a_la_hermana, presencio, 1390).
+recuerdo(frieren, rescatar_a_la_hermana , presencio, 1390).
+recuerdo(lawine, destruir_al_demonio_aura, cancion, 1393).
+recuerdo(voll, destruir_al_demonio_aura, libro(50), 1400).
+recuerdo(serie, destruir_al_rey_demonio, libro(100), 1335).
+recuerdo(kanne, recuperar_al_gato_perdido, presencio, 1375).
 
+hazania(rescatar_a_la_hermana, klares, dos(stark, fern)).
+hazania(destruir_al_demonio_aura, weise, frieren).
+hazania(destruir_al_demonio_aura, auberst, denken).
+hazania(destruir_al_rey_demonio, ende, cuatro(frieren, himmel, heiter, eisen)).
+hazania(recuperar_al_gato_perdido, weise, dos(himmel, frieren)).
+
+recuerda(Persona, Hazania, AnioPedido):-
+    recuerdo(Persona, Hazania, FormaPresenciarlo, AnioDeRecuerdo),
+    AnioPedido >= AnioDeRecuerdo,
+    recuerdaHasta(Persona, FormaPresenciarlo, AnioPedido, AnioDeRecuerdo).
+
+recuerdaHasta(Persona, presencio, AnioPedido, _):-
+    estaViva(Persona, AnioPedido).
+
+recuerdaHasta(_, cancion, AnioPedido, AnioDeRecuerdo):-
+    AnioHasta is AnioDeRecuerdo + 15,
+    AnioPedido =< AnioHasta.
+
+recuerdaHasta(_, libro(Paginas), AnioPedido, AnioDeRecuerdo):-
+    AnioHasta is AnioDeRecuerdo + Paginas,
+    AnioPedido =< AnioHasta.
+
+hazaniaCorroborada(Hazania):-
+    hazania(Hazania, UnLugar, Realizadores1),
+    not((hazania(Hazania, OtroLugar, Realizadores2), 
+            sonVersionesDistintas(UnLugar, Realizadores1, OtroLugar, Realizadores2)
+        )).
+
+sonVersionesDistintas(UnLugar, _, OtroLugar, _):-
+    UnLugar \= OtroLugar.
+
+sonVersionesDistintas(_, Realizadores1, _, Realizadores2):-
+    Realizadores1 \= Realizadores2.
 
 :- begin_tests(tpIntegrador, []).
     test(kanne_esta_viva_en_1370) :-
@@ -44,4 +84,22 @@ estaViva(Persona, Anio) :-
         not(estaViva(voll, 1551)).
     test(serie_esta_viva_en_5000) :-
         estaViva(serie, 5000).
+    test(lawine_no_recuerda_destruir_al_demonio_aura_en_1380) :-
+        not(recuerda(lawine, destruir_al_demonio_aura, 1380)).
+    test(lawine_recuerda_destruir_al_demonio_aura_en_1400) :-
+        recuerda(lawine, destruir_al_demonio_aura, 1400).
+    test(lawine_ya_no_recuerda_destruir_al_demonio_aura_1410) :-
+         not(recuerda(lawine, destruir_al_demonio_aura, 1410)).
+    test(voll_recuerda_destuir_al_demonio_aura_en_1450) :-
+        recuerda(voll, destruir_al_demonio_aura, 1450).
+    test(voll_no_recuerda_destuir_al_demonio_aura_en_1460) :-
+        not(recuerda(voll, destruir_al_demonio_aura, 1460)).
+    test(wirbel_recuerda_rescatar_a_la_hermana_en_1430) :-
+        recuerda(wirbel, rescatar_a_la_hermana, 1430).
+    test(wirbel_ya_no_recuerda_rescatar_a_la_hermana_en_1440) :-
+        not(recuerda(wirbel, rescatar_a_la_hermana, 1440)).
+    test(rescatar_a_la_hermana_es_corroborada) :-
+        hazaniaCorroborada(rescatar_a_la_hermana).
+    test(destruir_al_demonio_aura_no_es_corroborada) :-
+        not(hazaniaCorroborada(destruir_al_demonio_aura)).
 :- end_tests(tpIntegrador).
