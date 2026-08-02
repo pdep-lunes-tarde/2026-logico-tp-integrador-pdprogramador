@@ -52,10 +52,12 @@ recuerdaHasta(Persona, presencio, AnioPedido, _):-
     estaViva(Persona, AnioPedido).
 
 recuerdaHasta(_, cancion, AnioPedido, AnioDeRecuerdo):-
+    estaViva(Persona, AnioPedido),
     AnioHasta is AnioDeRecuerdo + 15,
     AnioPedido =< AnioHasta.
 
 recuerdaHasta(_, libro(Paginas), AnioPedido, AnioDeRecuerdo):-
+    estaViva(Persona, AnioPedido),
     AnioHasta is AnioDeRecuerdo + Paginas,
     AnioPedido =< AnioHasta.
 
@@ -70,6 +72,9 @@ sonVersionesDistintas(UnLugar, _, OtroLugar, _):-
 
 sonVersionesDistintas(_, Realizadores1, _, Realizadores2):-
     Realizadores1 \= Realizadores2.
+
+
+
 
 :- begin_tests(tpIntegrador, []).
     test(kanne_esta_viva_en_1370) :-
@@ -102,4 +107,9 @@ sonVersionesDistintas(_, Realizadores1, _, Realizadores2):-
         hazaniaCorroborada(rescatar_a_la_hermana).
     test(destruir_al_demonio_aura_no_es_corroborada) :-
         not(hazaniaCorroborada(destruir_al_demonio_aura)).
+    test(destruir_al_demonio_aura_paso_al_olvido_en_1460) :-
+        pasoAlOlvido(destruir_al_demonio_aura, 1460).
+    test(destruir_al_demonio_aura_no_paso_al_olvido_en_1440) :-
+        not(pasoAlOlvido(destruir_al_demonio_aura, 1440)).
 :- end_tests(tpIntegrador).
+
