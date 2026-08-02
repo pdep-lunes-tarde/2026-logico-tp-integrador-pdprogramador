@@ -42,21 +42,25 @@ hazania(destruir_al_demonio_aura, weise, frieren).
 hazania(destruir_al_demonio_aura, auberst, denken).
 hazania(destruir_al_rey_demonio, ende, cuatro(frieren, himmel, heiter, eisen)).
 hazania(recuperar_al_gato_perdido, weise, dos(himmel, frieren)).
+hazania(destruir_a_schlat_el_omnisciente, ende, el_heroe_del_sur).
 
 recuerda(Persona, Hazania, AnioPedido):-
-    recuerdo(Persona, Hazania, FormaPresenciarlo, AnioDeRecuerdo),
+    conocio(Persona, Hazania, FormaPresenciarlo, AnioDeRecuerdo),
     AnioPedido >= AnioDeRecuerdo,
     recuerdaHasta(Persona, FormaPresenciarlo, AnioPedido, AnioDeRecuerdo).
+
+conocio(Persona, Hazania, Forma, Anio) :-
+    recuerdo(Persona, Hazania, Forma, Anio).
 
 recuerdaHasta(Persona, presencio, AnioPedido, _):-
     estaViva(Persona, AnioPedido).
 
-recuerdaHasta(_, cancion, AnioPedido, AnioDeRecuerdo):-
+recuerdaHasta(Persona, cancion, AnioPedido, AnioDeRecuerdo):-
     estaViva(Persona, AnioPedido),
     AnioHasta is AnioDeRecuerdo + 15,
     AnioPedido =< AnioHasta.
 
-recuerdaHasta(_, libro(Paginas), AnioPedido, AnioDeRecuerdo):-
+recuerdaHasta(Persona, libro(Paginas), AnioPedido, AnioDeRecuerdo):-
     estaViva(Persona, AnioPedido),
     AnioHasta is AnioDeRecuerdo + Paginas,
     AnioPedido =< AnioHasta.
@@ -73,7 +77,51 @@ sonVersionesDistintas(UnLugar, _, OtroLugar, _):-
 sonVersionesDistintas(_, Realizadores1, _, Realizadores2):-
     Realizadores1 \= Realizadores2.
 
+pasoAlOlvido(Hazania, Anio) :-
+    hazania(Hazania, _, _), 
+    not(recuerda(_, Hazania, Anio)).
 
+% PARTE N°3
+conmemoracion(weise, festividad(destruir_al_rey_demonio, 1340)).
+conmemoracion(auberst, estatua(bronce, el_equipo_de_heroes, destruir_al_rey_demonio, 1370)).
+conmemoracion(auberst, estatua(marmol, el_heroe_del_sur, destruir_a_schlat_el_omnisciente, 1340)).
+
+mantenimiento(el_equipo_de_heroes, 1400).
+mantenimiento(el_equipo_de_heroes, 1450).
+mantenimiento(el_heroe_del_sur, 1410).
+
+conocio(Persona, Hazania, festividad, AnioConocio) :-
+    habitante(Persona, _, Nacimiento, Pueblo),
+    conmemoracion(Pueblo, festividad(Hazania, AnioInicioFestividad)),
+    AnioConocio is max(Nacimiento, AnioInicioFestividad).
+
+conocio(Persona, Hazania, estatua(Material, NombreEstatua, AnioInicio), AnioConocio) :-
+    habitante(Persona, _, Nacimiento, Pueblo),
+    conmemoracion(Pueblo, estatua(Material, NombreEstatua, Hazania, AnioInicio)),
+    AnioConocio is max(Nacimiento, AnioInicio).
+
+recuerdaHasta(Persona, festividad, AnioPedido, _) :-
+    estaViva(Persona, AnioPedido).
+
+recuerdaHasta(Persona, estatua(Material, NombreEstatua, AnioInicio), AnioPedido, _) :-
+    estaViva(Persona, AnioPedido),
+    estatuaEnBuenEstado(Material, NombreEstatua, AnioInicio, AnioPedido).
+
+vidaUtilMaterial(marmol, 30).
+vidaUtilMaterial(bronce, 15).
+
+estatuaEnBuenEstado(Material, _, AnioInicio, AnioPedido) :-
+    vidaUtilMaterial(Material, VidaMaxima),
+    AnioPedido >= AnioInicio,
+    Diferencia is AnioPedido - AnioInicio,
+    Diferencia =< VidaMaxima.
+
+estatuaEnBuenEstado(Material, NombreEstatua, _, AnioPedido) :-
+    vidaUtilMaterial(Material, VidaMaxima),
+    mantenimiento(NombreEstatua, AnioMantenimiento),
+    AnioPedido >= AnioMantenimiento,
+    Diferencia is AnioPedido - AnioMantenimiento,
+    Diferencia =< VidaMaxima.
 
 
 :- begin_tests(tpIntegrador, []).
@@ -111,5 +159,11 @@ sonVersionesDistintas(_, Realizadores1, _, Realizadores2):-
         pasoAlOlvido(destruir_al_demonio_aura, 1460).
     test(destruir_al_demonio_aura_no_paso_al_olvido_en_1440) :-
         not(pasoAlOlvido(destruir_al_demonio_aura, 1440)).
+    test(lawine_recuerda_rey_demonio_1400_por_estatua) :-
+        recuerda(lawine, destruir_al_rey_demonio, 1400).
+    test(lawine_no_recuerda_rey_demonio_1390_porque_estatua_rota) :-
+        not(recuerda(lawine, destruir_al_rey_demonio, 1390)).
+    test(fern_recuerda_rey_demonio_1400_por_festividad) :-
+        recuerda(fern, destruir_al_rey_demonio, 1400).
 :- end_tests(tpIntegrador).
 
