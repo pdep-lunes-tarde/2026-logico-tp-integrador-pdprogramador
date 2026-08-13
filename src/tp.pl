@@ -73,8 +73,18 @@ sonVersionesDistintas(UnLugar, _, OtroLugar, _):-
 sonVersionesDistintas(_, Realizadores1, _, Realizadores2):-
     Realizadores1 \= Realizadores2.
 
+pasoAlOlvido(Hazania, Anio) :-
+    hazania(Hazania,_,_),
+    not(recuerda(_,Hazania,Anio)).
 
+% PARTE N° 3
+conmemoracion(weise, diaFestivo(1340), destruir_al_rey_demonio).
+conmemoracion(auberst, estatua(bronce, equipo_de_heroes, 1370), destruir_al_rey_demonio).
+conmemoracion(auberst, estatua(marmol, el_heroe_del_sur, 1340), destruir_a_schlat_el_omnisciente).
 
+mantenimiento(equipo_de_heroes, 1400).
+mantenimiento(equipo_de_heroes, 1450).
+mantenimiento(el_heroe_del_sur, 1410).
 
 :- begin_tests(tpIntegrador, []).
     test(kanne_esta_viva_en_1370) :-
