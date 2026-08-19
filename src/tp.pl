@@ -69,7 +69,7 @@ recuerda(Persona, Hazania, AnioPedido) :-
     recuerdaHasta(FormaPresenciarlo, AnioPedido, AnioDeRecuerdo).
 
 
-% FUNCIONES DE CONOCER HAZAÑIA
+% FUNCIONES DE CONOCER HAZAÑA
 conocio(Persona, Hazania, Forma, AnioConocio) :- 
     recuerdo(Persona, Hazania, Forma, AnioConocio).
 
@@ -89,7 +89,7 @@ conocio(Persona, Hazania, estatua(Material, NombreEstatua, AnioInicio), AnioCono
     conmemoracion(Pueblo, estatua(Material, NombreEstatua, Hazania), AnioInicio),
     anioQueConocio(Nacimiento, AnioInicio, AnioConocio).
 
-% FUNCIONES DE RECORDAR LA HAZAÑIA POR CIERTO TIEMPO
+% FUNCIONES DE RECORDAR LA HAZAÑA POR CIERTO TIEMPO
 recuerdaHasta(presencio, _, _).
 
 recuerdaHasta(cancion, AnioPedido, AnioDeRecuerdo) :-
