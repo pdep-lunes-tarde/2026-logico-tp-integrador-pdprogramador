@@ -209,6 +209,32 @@ caminoDeInspiracion(HeroeA, HeroeB, [HeroeA, UnInspirado | Resto]) :-
     not(member(HeroeA, [UnInspirado | Resto])),
     caminoDeInspiracion(UnInspirado, HeroeB, [UnInspirado | Resto]).
 
+% Punto 6
+equipoDeLosSuenios(Heroe, Equipo) :-
+    caminoDeInspiracion(_, Heroe, Camino),
+    combinacion(Subconjunto, Camino),
+    member(Heroe, Subconjunto),
+    length(Subconjunto, Cantidad),
+    Cantidad >= 2,
+    permutacion(Subconjunto, Equipo).
+
+combinacion([], []).
+
+combinacion([Elemento | RestoCombinacion], [Elemento | RestoOriginal]) :-
+    combinacion(RestoCombinacion, RestoOriginal).
+
+combinacion(Combinacion, [_ | RestoOriginal]) :-
+    combinacion(Combinacion, RestoOriginal).
+
+permutacion([], []).
+
+permutacion([Cabeza | Cola], Permutacion) :-
+    permutacion(Cola, RestoPermutado),
+    insertar(Cabeza, RestoPermutado, Permutacion).
+
+insertar(Elemento, Lista, [Elemento | Lista]).
+insertar(Elemento, [Cabeza | Cola], [Cabeza | Resto]) :-
+    insertar(Elemento, Cola, Resto).
 
 % TESTS
 
@@ -247,4 +273,10 @@ caminoDeInspiracion(HeroeA, HeroeB, [HeroeA, UnInspirado | Resto]) :-
     test(cadena_de_inspiracion_valida_con_multiples_eslabones) :- caminoDeInspiracion(himmel, denken, [himmel, frieren, fern, denken]).
     test(cadena_de_inspiracion_invalida_si_no_hay_relacion_de_inspiracion) :- not(caminoDeInspiracion(denken, frieren, [denken, frieren])).
     test(cadena_de_inspiracion_no_permite_ciclos_repetidos) :- not(caminoDeInspiracion(frieren, frieren, [frieren, fern, frieren])).
+
+    % --- Tests Punto 6 ---
+    test(dream_team_valido_con_heroe_y_antecesor) :- equipoDeLosSuenios(fern, [fern, himmel]).
+    test(dream_team_valido_independientemente_del_orden) :- equipoDeLosSuenios(fern, [himmel, fern]).
+    test(heroe_solo_no_es_dream_team) :- not(equipoDeLosSuenios(fern, [fern])).
+    test(equipo_sin_el_heroe_no_es_dream_team) :- not(equipoDeLosSuenios(fern, [frieren])).
 :- end_tests(tpIntegrador).
