@@ -136,7 +136,8 @@ recuerdaHazaniaPueblo(Pueblo, Hazania, AnioDado) :-
     recuerda(Persona, Hazania, AnioDado).
 
 cantidadDeHojasLeidas(Pueblo, AnioDado, CantidadTotalDePaginas) :-
-    findall(Paginas, (habitante(Persona, _, _, Pueblo), recuerda(Persona, Hazania, AnioDado), conocio(Persona, Hazania, libro(Paginas), _)),TotalPaginas),
+    habitante(_, _, _, Pueblo),
+    findall(Paginas, (habitante(Persona, _, _, Pueblo), conocio(Persona, Hazania, libro(Paginas), AnioDado)),TotalPaginas),
     sum_list(TotalPaginas, CantidadTotalDePaginas).
     
 puebloMasLector(Pueblo, AnioDado) :-
@@ -296,6 +297,8 @@ insertar(Elemento, [Cabeza | Cola], [Cabeza | Resto]) :-
         not(recuerdaHazaniaPueblo(klares, destruir_al_rey_demonio, 1395)).
     test(pueblo_suma_correctamente_todas_las_paginas_leidas) :- 
         cantidadDeHojasLeidas(weise, 1335, 100).
+    test(pueblo_suma_cero_paginas_leidas_si_no_hubo_libros) :- 
+        cantidadDeHojasLeidas(weise, 1336, 0).
     test(pueblo_con_mayor_cantidad_de_hojas_leidas_es_el_mas_lector) :- 
         puebloMasLector(ende, 1400).
     test(pueblo_musical_si_mayor_parte_de_hazanias_recordadas_son_canciones) :- 
