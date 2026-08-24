@@ -16,12 +16,11 @@ promedioVida(humano, 80).
 promedioVida(enano, 350).
 
 recuerdo(wirbel, rescatar_a_la_hermana, presencio, 1390).
-recuerdo(frieren, rescatar_a_la_hermana , presencio, 1390).
+recuerdo(frieren, rescatar_a_la_hermana, presencio, 1390).
 recuerdo(lawine, destruir_al_demonio_aura, cancion, 1393).
 recuerdo(voll, destruir_al_demonio_aura, libro(50), 1400).
 recuerdo(serie, destruir_al_rey_demonio, libro(100), 1335).
 recuerdo(kanne, recuperar_al_gato_perdido, presencio, 1375).
-recuerdo(denken, rescatar_a_la_hermana, libro(50), 1400). % Agregado para test de Punto 5
 
 % implementacion de listas en vez de functores dos/2 o cuatro/4
 hazania(rescatar_a_la_hermana, klares, [stark, fern]).
@@ -201,13 +200,17 @@ inspiro(Inspirador, Heroe) :-
     member(Inspirador, Participantes),
     Inspirador \= Heroe.
 
-caminoDeInspiracion(HeroeA, HeroeB, [HeroeA, HeroeB]) :-
-    inspiro(HeroeA, HeroeB).
+caminoDeInspiracion(HeroeA, HeroeB, Camino) :-
+    caminoRecursivo(HeroeA, HeroeB, [HeroeA], Camino).
 
-caminoDeInspiracion(HeroeA, HeroeB, [HeroeA, UnInspirado | Resto]) :-
-    inspiro(HeroeA, UnInspirado),
-    not(member(HeroeA, [UnInspirado | Resto])),
-    caminoDeInspiracion(UnInspirado, HeroeB, [UnInspirado | Resto]).
+caminoRecursivo(HeroeA, HeroeB, Visitados, [HeroeA, HeroeB]) :-
+    inspiro(HeroeA, HeroeB),
+    not(member(HeroeB, Visitados)).
+
+caminoRecursivo(HeroeA, HeroeB, Visitados, [HeroeA | RestoCamino]) :-
+    inspiro(HeroeA, Intermediario),
+    not(member(Intermediario, Visitados)),
+    caminoRecursivo(Intermediario, HeroeB, [Intermediario | Visitados], RestoCamino).
 
 % Punto 6
 equipoDeLosSuenios(Heroe, Equipo) :-
@@ -240,43 +243,103 @@ insertar(Elemento, [Cabeza | Cola], [Cabeza | Resto]) :-
 
 :- begin_tests(tpIntegrador, []).
 
-    % --- Tests Parte 1 ---
-    test(persona_esta_viva_durante_su_expectativa_de_vida) :- estaViva(kanne, 1370).
-    test(persona_no_esta_viva_antes_de_su_nacimiento) :- not(estaViva(kanne, 1300)).
-    test(enano_esta_vivo_durante_su_expectativa_extendida) :- estaViva(voll, 1550).
-    test(enano_no_esta_vivo_al_superar_su_expectativa) :- not(estaViva(voll, 1551)).
-    test(elfo_esta_vivo_indefinidamente) :- estaViva(serie, 5000).
-    test(persona_no_recuerda_hazania_antes_de_conocerla) :- not(recuerda(lawine, destruir_al_demonio_aura, 1380)).
-    test(persona_recuerda_hazania_por_cancion_dentro_de_su_duracion) :- recuerda(lawine, destruir_al_demonio_aura, 1400).
-    test(persona_olvida_hazania_por_cancion_tras_vencer_duracion) :- not(recuerda(lawine, destruir_al_demonio_aura, 1410)).
-    test(hazania_unica_es_corroborada) :- hazaniaCorroborada(rescatar_a_la_hermana).
-    test(hazania_multiples_versiones_no_es_corroborada) :- not(hazaniaCorroborada(destruir_al_demonio_aura)).
-    test(hazania_sin_nadie_que_la_recuerde_pasa_al_olvido) :- pasoAlOlvido(destruir_al_demonio_aura, 1460).
-    test(persona_recuerda_hazania_por_estatua_mantenida) :- recuerda(lawine, destruir_al_rey_demonio, 1400).
-    test(persona_olvida_hazania_por_estatua_deteriorada) :- not(recuerda(lawine, destruir_al_rey_demonio, 1390)).
+    % --- Tests Punto 1 ---
+    test(persona_esta_viva_durante_su_expectativa_de_vida) :- 
+        estaViva(kanne, 1370).
+    test(persona_no_esta_viva_antes_de_su_nacimiento) :- 
+        not(estaViva(kanne, 1300)).
+    test(persona_no_esta_viva_tras_superar_su_expectativa_de_vida) :- 
+        not(estaViva(kanne, 2000)).
+    test(enano_esta_vivo_durante_su_expectativa_extendida) :- 
+        estaViva(voll, 1550).
+    test(enano_no_esta_vivo_al_superar_su_expectativa) :- 
+        not(estaViva(voll, 1551)).
+    test(elfo_esta_vivo_indefinidamente) :- 
+        estaViva(serie, 5000).
+
+    % --- Tests Punto 2 ---
+    test(persona_no_recuerda_hazania_antes_de_conocerla) :- 
+        not(recuerda(lawine, destruir_al_demonio_aura, 1380)).
+    test(persona_recuerda_hazania_por_cancion_dentro_de_su_duracion) :- 
+        recuerda(lawine, destruir_al_demonio_aura, 1400).
+    test(persona_olvida_hazania_por_cancion_tras_vencer_duracion) :- 
+        not(recuerda(lawine, destruir_al_demonio_aura, 1410)).
+    test(persona_recuerda_hazania_por_libro_dentro_de_su_duracion) :- 
+        recuerda(voll, destruir_al_demonio_aura, 1450).
+    test(persona_olvida_hazania_por_libro_tras_vencer_duracion) :- 
+        not(recuerda(voll, destruir_al_demonio_aura, 1460)).
+    test(persona_recuerda_hazania_presenciada_durante_toda_su_vida) :- 
+        recuerda(wirbel, rescatar_a_la_hermana, 1430).
+    test(persona_no_recuerda_hazania_presenciada_si_ya_fallecio) :- 
+        not(recuerda(wirbel, rescatar_a_la_hermana, 1440)).
+    test(hazania_unica_es_corroborada) :- 
+        hazaniaCorroborada(rescatar_a_la_hermana).
+    test(hazania_multiples_versiones_no_es_corroborada) :- 
+        not(hazaniaCorroborada(destruir_al_demonio_aura)).
+    test(hazania_sin_nadie_que_la_recuerde_pasa_al_olvido) :- 
+        pasoAlOlvido(destruir_al_demonio_aura, 1460).
+    test(hazania_no_pasa_al_olvido_si_al_menos_alguien_la_recuerda) :- 
+        not(pasoAlOlvido(destruir_al_demonio_aura, 1440)).
+
+    % --- Tests Punto 3 ---
+    test(persona_recuerda_hazania_por_festividad_en_su_pueblo) :- 
+        recuerda(fern, destruir_al_rey_demonio, 1400).
+    test(persona_recuerda_hazania_por_estatua_mantenida) :- 
+        recuerda(lawine, destruir_al_rey_demonio, 1400).
+    test(persona_olvida_hazania_por_estatua_deteriorada) :- 
+        not(recuerda(lawine, destruir_al_rey_demonio, 1390)).
 
     % --- Tests Punto 4 ---
-    test(pueblo_recuerda_hazania_si_al_menos_un_habitante_la_recuerda) :- recuerdaHazaniaPueblo(weise, destruir_al_rey_demonio, 1400).
-    test(pueblo_suma_correctamente_todas_las_paginas_leidas) :- cantidadDeHojasLeidas(weise, 1335, 100).
-    test(pueblo_con_mayor_cantidad_de_hojas_leidas_es_el_mas_lector) :- puebloMasLector(ende, 1400).
-    test(pueblo_musical_si_mayor_parte_de_hazanias_recordadas_son_canciones) :- puebloMusical(auberst, 1395).
-    test(pueblo_no_musical_si_canciones_no_superan_a_otros_medios) :- not(puebloMusical(weise, 1400)).
-    test(pueblo_chismoso_si_ninguna_hazania_recordada_esta_corroborada) :- esChismoso(ende, 1420).
-    test(hazania_importante_si_absolutamente_todo_el_pueblo_vivo_la_recuerda) :- hazaniaImportante(destruir_al_rey_demonio, weise, 1400).
-    test(tiempos_sin_precedentes_si_toda_hazania_importante_fue_presenciada) :- tiemposSinPrecedentes(klares, 1395).
+    test(pueblo_recuerda_hazania_si_al_menos_un_habitante_la_recuerda) :- 
+        recuerdaHazaniaPueblo(weise, destruir_al_rey_demonio, 1400).
+    test(pueblo_no_recuerda_hazania_si_ningun_habitante_la_conoce) :- 
+        not(recuerdaHazaniaPueblo(klares, destruir_al_rey_demonio, 1395)).
+    test(pueblo_suma_correctamente_todas_las_paginas_leidas) :- 
+        cantidadDeHojasLeidas(weise, 1335, 100).
+    test(pueblo_con_mayor_cantidad_de_hojas_leidas_es_el_mas_lector) :- 
+        puebloMasLector(ende, 1400).
+    test(pueblo_musical_si_mayor_parte_de_hazanias_recordadas_son_canciones) :- 
+        puebloMusical(auberst, 1395).
+    test(pueblo_no_musical_si_canciones_no_superan_a_otros_medios) :- 
+        not(puebloMusical(weise, 1400)).
+    test(pueblo_chismoso_si_ninguna_hazania_recordada_esta_corroborada) :- 
+        esChismoso(ende, 1420).
+    test(pueblo_no_es_chismoso_si_tiene_al_menos_una_hazania_corroborada) :- 
+        not(esChismoso(weise, 1400)).
+    test(hazania_importante_si_absolutamente_todo_el_pueblo_vivo_la_recuerda) :- 
+        hazaniaImportante(destruir_al_rey_demonio, weise, 1400).
+    test(hazania_no_es_importante_si_no_la_recuerda_todo_el_pueblo) :- 
+        not(hazaniaImportante(recuperar_al_gato_perdido, weise, 1400)).
+    test(tiempos_sin_precedentes_si_toda_hazania_importante_fue_presenciada) :- 
+        tiemposSinPrecedentes(klares, 1395).
+    test(pueblo_no_vive_tiempos_sin_precedentes_si_hazanias_no_fueron_presenciadas) :- 
+        not(tiemposSinPrecedentes(weise, 1400)).
 
     % --- Tests Punto 5 ---
-    test(persona_participante_en_hazania_conocida_es_heroe) :- heroe(frieren).
-    test(persona_sin_participacion_en_hazania_conocida_no_es_heroe) :- not(heroe(wirbel)).
-    test(heroe_inspira_a_otro_si_este_conoce_su_hazania) :- inspiro(frieren, fern).
-    test(inspiracion_funciona_hacia_atras_en_el_tiempo) :- inspiro(stark, frieren).
-    test(cadena_de_inspiracion_valida_con_multiples_eslabones) :- caminoDeInspiracion(himmel, denken, [himmel, frieren, fern, denken]).
-    test(cadena_de_inspiracion_invalida_si_no_hay_relacion_de_inspiracion) :- not(caminoDeInspiracion(denken, frieren, [denken, frieren])).
-    test(cadena_de_inspiracion_no_permite_ciclos_repetidos) :- not(caminoDeInspiracion(frieren, frieren, [frieren, fern, frieren])).
+    test(persona_participante_en_hazania_conocida_es_heroe) :- 
+        heroe(frieren).
+    test(persona_sin_participacion_en_hazania_conocida_no_es_heroe) :- 
+        not(heroe(wirbel)).
+    test(heroe_inspira_a_otro_si_este_conoce_su_hazania) :- 
+        inspiro(frieren, fern).
+    test(inspiracion_funciona_hacia_atras_en_el_tiempo) :- 
+        inspiro(stark, frieren).
+    test(persona_sin_hazanias_conocidas_no_es_inspirada_por_nadie) :- 
+        not(inspiro(_, eisen)).
+    test(cadena_de_inspiracion_valida_con_multiples_eslabones) :- 
+        caminoDeInspiracion(himmel, denken, [himmel, fern, frieren, denken]).
+    test(cadena_de_inspiracion_invalida_si_no_hay_relacion_de_inspiracion) :- 
+        not(caminoDeInspiracion(denken, frieren, [denken, frieren])).
+    test(cadena_de_inspiracion_no_permite_ciclos_repetidos) :- 
+        not(caminoDeInspiracion(frieren, frieren, [frieren, fern, frieren])).
 
     % --- Tests Punto 6 ---
-    test(dream_team_valido_con_heroe_y_antecesor) :- equipoDeLosSuenios(fern, [fern, himmel]).
-    test(dream_team_valido_independientemente_del_orden) :- equipoDeLosSuenios(fern, [himmel, fern]).
-    test(heroe_solo_no_es_dream_team) :- not(equipoDeLosSuenios(fern, [fern])).
-    test(equipo_sin_el_heroe_no_es_dream_team) :- not(equipoDeLosSuenios(fern, [frieren])).
+    test(dream_team_valido_con_heroe_y_antecesor) :- 
+        equipoDeLosSuenios(fern, [fern, himmel]).
+    test(dream_team_valido_independientemente_del_orden) :- 
+        equipoDeLosSuenios(fern, [himmel, fern]).
+    test(heroe_solo_no_es_dream_team) :- 
+        not(equipoDeLosSuenios(fern, [fern])).
+    test(equipo_sin_el_heroe_no_es_dream_team) :- 
+        not(equipoDeLosSuenios(fern, [frieren])).
 :- end_tests(tpIntegrador).
