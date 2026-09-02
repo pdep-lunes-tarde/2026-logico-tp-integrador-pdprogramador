@@ -40,9 +40,7 @@ mantenimiento(el_heroe_del_sur, 1410).
 
 % Agregado para tener un generador de pueblos unicos y evitar repetir los calculos por cada persona que vivia en un pueblo.
 pueblo(Pueblo) :-
-    findall(P, habitante(_, _, _, P), ListaPueblos),
-    list_to_set(ListaPueblos, PueblosUnicos),
-    member(Pueblo, PueblosUnicos).
+    distinct(Pueblo, habitante(_, _, _, Pueblo)).
 
 anioDeMuerte(Persona, AnioMuerte) :- 
     habitante(Persona, Especie, Nacimiento, _),
@@ -155,21 +153,18 @@ puebloMusical(Pueblo, AnioDado) :-
     CantidadHazaniasMusicales > CantidadHazaniasNoMusicales.
 
 hazaniasMusicales(Pueblo, AnioDado, CantidadHazaniasMusicales) :-
-    findall(Hazania, (habitante(Persona, _, _, Pueblo), conocio(Persona, Hazania, cancion, _), recuerda(Persona, Hazania, AnioDado)), ListaConDuplicados),
+    findall(Hazania, (recuerdaHazaniaPueblo(Pueblo, Hazania, AnioDado), conocio(Persona, Hazania, cancion, _)), ListaConDuplicados),
     list_to_set(ListaConDuplicados, HazaniasMusicalesSinDuplicados),
     length(HazaniasMusicalesSinDuplicados, CantidadHazaniasMusicales).
 
 hazaniasNoMusicales(Pueblo, AnioDado, CantidadHazaniasNoMusicales) :-
-    findall(Hazania, (habitante(Persona, _, _, Pueblo), recuerda(Persona, Hazania, AnioDado),not(conocio(Persona, Hazania, cancion, _))), ListaConDuplicados),
+    findall(Hazania, (recuerdaHazaniaPueblo(Pueblo, Hazania, AnioDado), not(conocio(Persona, Hazania, cancion, _))), ListaConDuplicados),
     list_to_set(ListaConDuplicados, HazaniasNoMusicalesSinDuplicados),
     length(HazaniasNoMusicalesSinDuplicados, CantidadHazaniasNoMusicales).
     
 esChismoso(Pueblo, AnioDado) :- 
     recuerdaHazaniaPueblo(Pueblo, _, AnioDado),
-    forall(
-        recuerdaHazaniaPueblo(Pueblo, Hazania, AnioDado),
-        not(hazaniaCorroborada(Hazania))
-    ).
+    not((recuerdaHazaniaPueblo(Pueblo, Hazania, AnioDado), hazaniaCorroborada(Hazania))).
 
 hazaniaImportante(Hazania, Pueblo, AnioDado) :-
     recuerdaHazaniaPueblo(Pueblo, Hazania, AnioDado),
@@ -202,16 +197,16 @@ inspiro(Inspirador, Heroe) :-
     Inspirador \= Heroe.
 
 caminoDeInspiracion(HeroeA, HeroeB, Camino) :-
-    caminoRecursivo(HeroeA, HeroeB, [HeroeA], Camino).
+    caminoRecursivo(HeroeA, [HeroeA], Camino).
 
-caminoRecursivo(HeroeA, HeroeB, Visitados, [HeroeA, HeroeB]) :-
+caminoRecursivo(HeroeA, Visitados, [HeroeA, HeroeB]) :-
     inspiro(HeroeA, HeroeB),
     not(member(HeroeB, Visitados)).
 
-caminoRecursivo(HeroeA, HeroeB, Visitados, [HeroeA | RestoCamino]) :-
+caminoRecursivo(HeroeA, Visitados, [HeroeA | RestoCamino]) :-
     inspiro(HeroeA, Intermediario),
     not(member(Intermediario, Visitados)),
-    caminoRecursivo(Intermediario, HeroeB, [Intermediario | Visitados], RestoCamino).
+    caminoRecursivo(Intermediario, [Intermediario | Visitados], RestoCamino).
 
 % Punto 6
 equipoDeLosSuenios(Heroe, Equipo) :-
